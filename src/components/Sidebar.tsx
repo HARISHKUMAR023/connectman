@@ -8,20 +8,21 @@ interface Collection {
   description: string
 }
 
-interface Request {
+interface Server {
   id: number
   collectionId: number
   name: string
-  method: string
-  url: string
+  host: string
+  port: number
+  username: string
 }
 
 interface SidebarProps {
-  onSelectRequest?: (request: Request) => void
+  onSelectServer?: (server: Server) => void
   onCollectionsChanged?: () => void
 }
 
-export default function Sidebar({ onSelectRequest, onCollectionsChanged }: SidebarProps) {
+export default function Sidebar({ onSelectServer, onCollectionsChanged }: SidebarProps) {
   const [collections, setCollections] = useState<Collection[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null)
@@ -31,49 +32,45 @@ export default function Sidebar({ onSelectRequest, onCollectionsChanged }: Sideb
   }, [])
 const loadCollections = async () => {
   try {
-    const result = await window.ipcRenderer.invoke('collections:get')
+    const result = await window.ipcRenderer.invoke('collection:getAll')
     setCollections(result || [])
   } catch (err) {
     console.error('Failed to load collections:', err)
   }
 }
 
-  const handleAddCollection = async (collection: { name: string }) => {
+const handleAddCollection = async (collection: { name: string; description: string }) => {
   try {
-    await window.ipcRenderer.invoke('collections:add', collection.name)
+    await window.ipcRenderer.invoke('collection:create', collection)
     setIsModalOpen(false)
     loadCollections()
+    onCollectionsChanged?.()
   } catch (err) {
     console.error('Failed to add collection:', err)
   }
 }
 
-  const handleDeleteCollection = async (collectionId: number) => {
-    if (window.confirm('Are you sure you want to delete this collection?')) {
-      try {
-         await window.ipcRenderer.invoke('collections:delete', collectionId)
-        loadCollections()
-        onCollectionsChanged?.()
-      } catch (err) {
-        console.error('Failed to delete collection:', err)
-      }
+const handleDeleteCollection = async (collectionId: number) => {
+  if (window.confirm('Are you sure you want to delete this collection and all its servers?')) {
+    try {
+      await window.ipcRenderer.invoke('collection:delete', collectionId)
+      loadCollections()
+      onCollectionsChanged?.()
+    } catch (err) {
+      console.error('Failed to delete collection:', err)
     }
   }
+}
 
-  const handleAddRequest = (collectionId: number) => {
-    console.log('Add request to collection:', collectionId)
-    // This will be handled in the main Dashboard component
-  }
-
-  const handleSelectRequest = (request: Request) => {
-    onSelectRequest?.(request)
-  }
+const handleSelectServer = (server: Server) => {
+  onSelectServer?.(server)
+}
 
   return (
     <div className="w-80 bg-sidebar h-full p-5 flex flex-col border-r border-border">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-text-primary">ConnectMan</h1>
-        <p className="text-xs text-text-secondary mt-1">API & SSH Manager</p>
+        <p className="text-xs text-text-secondary mt-1">Server Manager</p>
       </div>
 
       <div className="flex gap-2 mb-6">
@@ -88,16 +85,15 @@ const loadCollections = async () => {
       <div className="flex-1 overflow-y-auto space-y-4">
         <div>
           <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-3">
-            Collections
+            Server Collections
           </h3>
           {collections.length > 0 ? (
             <CollectionTree
               collections={collections}
               selectedCollectionId={selectedCollectionId}
               onSelectCollection={setSelectedCollectionId}
-              onSelectRequest={handleSelectRequest}
+              onSelectServer={handleSelectServer}
               onDeleteCollection={handleDeleteCollection}
-              onAddRequest={handleAddRequest}
             />
           ) : (
             <div className="text-sm text-text-muted p-3 text-center">

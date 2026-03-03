@@ -3,10 +3,11 @@ import { useState } from "react"
 type Props = {
   isOpen: boolean
   onClose: () => void
+  collectionId?: number
   onSave?: (server: any) => void
 }
 
-export default function AddServerModal({ isOpen, onClose, onSave }: Props) {
+export default function AddServerModal({ isOpen, onClose, collectionId, onSave }: Props) {
   const [name, setName] = useState("")
   const [host, setHost] = useState("")
   const [port, setPort] = useState("22")
@@ -23,7 +24,13 @@ export default function AddServerModal({ isOpen, onClose, onSave }: Props) {
       return
     }
 
+    if (!collectionId) {
+      alert("Please select a collection first")
+      return
+    }
+
     const server = {
+      collectionId,
       name: name.trim(),
       host: host.trim(),
       port: parseInt(port) || 22,
@@ -34,7 +41,7 @@ export default function AddServerModal({ isOpen, onClose, onSave }: Props) {
     }
 
     try {
-      await window.ipcRenderer.invoke("db:addServer", server)
+      await window.ipcRenderer.invoke("server:create", server)
       setName("")
       setHost("")
       setPort("22")

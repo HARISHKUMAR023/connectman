@@ -14,32 +14,45 @@ const require = createRequire(import.meta.url)
 const dbPath = path.join(process.cwd(), 'connectman.db')
 const db = new Database(dbPath)
 
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS servers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    host TEXT,
-    username TEXT,
-    port INTEGER
-  )
-`).run()
-
+// Collections table - for grouping servers
 db.prepare(`
   CREATE TABLE IF NOT EXISTS collections (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL
+    name TEXT NOT NULL UNIQUE,
+    description TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `).run()
 
+// Servers table - each server belongs to a collection
 db.prepare(`
   CREATE TABLE IF NOT EXISTS servers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    collection_id INTEGER,
-    name TEXT,
-    host TEXT,
-    username TEXT,
-    port INTEGER,
-    FOREIGN KEY(collection_id) REFERENCES collections(id)
+    collectionId INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    host TEXT NOT NULL,
+    port INTEGER DEFAULT 22,
+    username TEXT NOT NULL,
+    password TEXT,
+    privateKey TEXT,
+    connectionType TEXT DEFAULT 'ssh',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(collectionId) REFERENCES collections(id) ON DELETE CASCADE
+  )
+`).run()
+
+// SSH Sessions table - for tracking active connections
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS sshSessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    serverId INTEGER NOT NULL,
+    sessionId TEXT UNIQUE,
+    status TEXT DEFAULT 'disconnected',
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(serverId) REFERENCES servers(id) ON DELETE CASCADE
   )
 `).run()
 
@@ -90,40 +103,109 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.handle('add-server', (_, server) => {
-  db.prepare(`
-    INSERT INTO servers (name, host, username, port)
-    VALUES (?, ?, ?, ?)
-  `).run(server.name, server.host, server.username, server.port)
+// ===== COLLECTION HANDLERS =====
 
-  return true
+// Create a new collection
+ipcMain.handle('collection:create', (_, { name, description }) => {
+  try {
+    const result = db.prepare(`
+      INSERT INTO collections (name, description)
+      VALUES (?, ?)
+    `).run(name, description || '')
+    return { success: true, id: result.lastInsertRowid }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
 })
 
-ipcMain.handle('get-servers', () => {
-  return db.prepare(`SELECT * FROM servers`).all()
+// Get all collections
+ipcMain.handle('collection:getAll', () => {
+  try {
+    return db.prepare(`SELECT * FROM collections ORDER BY createdAt DESC`).all()
+  } catch (err: any) {
+    return { error: err.message }
+  }
 })
 
-
-// Add collection
-ipcMain.handle('collections:add', (_, name: string) => {
-  db.prepare(`
-    INSERT INTO collections (name)
-    VALUES (?)
-  `).run(name)
-
-  return true
+// Delete collection (cascades to delete all servers in it)
+ipcMain.handle('collection:delete', (_, collectionId: number) => {
+  try {
+    db.prepare(`DELETE FROM collections WHERE id = ?`).run(collectionId)
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
 })
 
-// Get collections
-ipcMain.handle('collections:get', () => {
-  return db.prepare(`SELECT * FROM collections`).all()
+// Update collection
+ipcMain.handle('collection:update', (_, { id, name, description }) => {
+  try {
+    db.prepare(`
+      UPDATE collections 
+      SET name = ?, description = ?, updatedAt = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(name, description || '', id)
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
 })
 
-// Delete collection
-ipcMain.handle('collections:delete', (_, id: number) => {
-  db.prepare(`DELETE FROM collections WHERE id = ?`).run(id)
-  db.prepare(`DELETE FROM servers WHERE collection_id = ?`).run(id)
-  return true
+// ===== SERVER HANDLERS =====
+
+// Create a new server in a collection
+ipcMain.handle('server:create', (_, { collectionId, name, host, port, username, password, privateKey, connectionType }) => {
+  try {
+    const result = db.prepare(`
+      INSERT INTO servers (collectionId, name, host, port, username, password, privateKey, connectionType)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(collectionId, name, host, port || 22, username, password || null, privateKey || null, connectionType || 'ssh')
+    return { success: true, id: result.lastInsertRowid }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+})
+
+// Get all servers in a collection
+ipcMain.handle('server:getByCollection', (_, collectionId: number) => {
+  try {
+    return db.prepare(`SELECT * FROM servers WHERE collectionId = ? ORDER BY createdAt DESC`).all(collectionId)
+  } catch (err: any) {
+    return { error: err.message }
+  }
+})
+
+// Get a single server
+ipcMain.handle('server:getById', (_, serverId: number) => {
+  try {
+    return db.prepare(`SELECT * FROM servers WHERE id = ?`).get(serverId)
+  } catch (err: any) {
+    return { error: err.message }
+  }
+})
+
+// Delete a server
+ipcMain.handle('server:delete', (_, serverId: number) => {
+  try {
+    db.prepare(`DELETE FROM servers WHERE id = ?`).run(serverId)
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+})
+
+// Update a server
+ipcMain.handle('server:update', (_, { id, name, host, port, username, password, privateKey, connectionType }) => {
+  try {
+    db.prepare(`
+      UPDATE servers
+      SET name = ?, host = ?, port = ?, username = ?, password = ?, privateKey = ?, connectionType = ?, updatedAt = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(name, host, port || 22, username, password || null, privateKey || null, connectionType || 'ssh', id)
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
 })
 
 // ✅ Proper error handling
