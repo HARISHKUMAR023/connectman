@@ -1,85 +1,88 @@
 @import "tailwindcss";
 @theme {
 
-  /* Background Colors */
+  /* Background Colors - Postman Dark Theme */
 
-  --color-background: oklch(0.12 0.02 260);
-  --color-sidebar: oklch(0.16 0.02 260);
-  --color-card: oklch(0.22 0.02 260);
-  --color-terminal: oklch(0.08 0.02 260);
-
-
-  /* Primary Colors (Green Theme) */
-
-  --color-primary-50: oklch(0.95 0.05 150);
-  --color-primary-100: oklch(0.90 0.07 150);
-  --color-primary-200: oklch(0.82 0.10 150);
-  --color-primary-300: oklch(0.75 0.13 150);
-  --color-primary-400: oklch(0.68 0.15 150);
-  --color-primary-500: oklch(0.62 0.17 150);
-  --color-primary-600: oklch(0.55 0.16 150);
-  --color-primary-700: oklch(0.48 0.14 150);
-  --color-primary-800: oklch(0.40 0.12 150);
-  --color-primary-900: oklch(0.30 0.10 150);
+  --color-background: #1C1C1C;
+  --color-sidebar: #262626;
+  --color-card: #2D2D2D;
+  --color-terminal: #0D0D0D;
 
 
-  /* Secondary Colors (Blue Theme) */
+  /* Primary Colors (Orange/Postman Theme) */
 
-  --color-secondary-50: oklch(0.95 0.04 240);
-  --color-secondary-100: oklch(0.90 0.06 240);
-  --color-secondary-200: oklch(0.82 0.08 240);
-  --color-secondary-300: oklch(0.75 0.11 240);
-  --color-secondary-400: oklch(0.68 0.14 240);
-  --color-secondary-500: oklch(0.60 0.16 240);
-  --color-secondary-600: oklch(0.52 0.15 240);
-  --color-secondary-700: oklch(0.45 0.13 240);
-  --color-secondary-800: oklch(0.38 0.11 240);
-  --color-secondary-900: oklch(0.30 0.09 240);
-
-
-  /* Danger Colors */
-
-  --color-danger-100: oklch(0.90 0.05 25);
-  --color-danger-300: oklch(0.75 0.12 25);
-  --color-danger-500: oklch(0.62 0.18 25);
-  --color-danger-700: oklch(0.48 0.15 25);
+  --color-primary-50: #FEF3E6;
+  --color-primary-100: #FDE4CC;
+  --color-primary-200: #FBC899;
+  --color-primary-300: #F9AC66;
+  --color-primary-400: #F79033;
+  --color-primary-500: #FF6C37;
+  --color-primary-600: #E55A2B;
+  --color-primary-700: #CC481F;
+  --color-primary-800: #B23613;
+  --color-primary-900: #992407;
 
 
-  /* Warning (Orange) */
+  /* Secondary Colors (Gray/White for contrast) */
 
-  --color-warning-100: oklch(0.92 0.05 60);
-  --color-warning-300: oklch(0.80 0.12 60);
-  --color-warning-500: oklch(0.70 0.16 60);
-  --color-warning-700: oklch(0.55 0.13 60);
+  --color-secondary-50: #F5F5F5;
+  --color-secondary-100: #EBEBEB;
+  --color-secondary-200: #D6D6D6;
+  --color-secondary-300: #C2C2C2;
+  --color-secondary-400: #ADADAD;
+  --color-secondary-500: #999999;
+  --color-secondary-600: #737373;
+  --color-secondary-700: #595959;
+  --color-secondary-800: #404040;
+  --color-secondary-900: #262626;
+
+
+  /* Status Colors */
+
+  --color-danger-100: #FEE2E2;
+  --color-danger-300: #FCA5A5;
+  --color-danger-500: #EF4444;
+  --color-danger-700: #B91C1C;
+
+
+  /* Warning (Orange/Yellow) */
+
+  --color-warning-100: #FEF3C7;
+  --color-warning-300: #FCD34D;
+  --color-warning-500: #F59E0B;
+  --color-warning-700: #D97706;
 
 
   /* Text Colors */
 
-  --color-text-primary: oklch(0.92 0.01 260);
-  --color-text-secondary: oklch(0.75 0.01 260);
-  --color-text-muted: oklch(0.60 0.01 260);
+  --color-text-primary: #E5E5E5;
+  --color-text-secondary: #A8A8A8;
+  --color-text-muted: #6B6B6B;
 
 
   /* Borders */
 
-  --color-border: oklch(0.30 0.01 260);
+  --color-border: #3D3D3D;
 
 
   /* Hover */
 
-  --color-hover: oklch(0.28 0.02 260);
+  --color-hover: #333333;
 
 
   /* Terminal Colors */
 
-  --color-terminal-text: oklch(0.75 0.18 150);
-  --color-terminal-cursor: oklch(0.95 0.01 260);
+  --color-terminal-text: #00FF00;
+  --color-terminal-error: #FF5555;
+  --color-terminal-warning: #FFAA00;
+  --color-terminal-cursor: #FFFFFF;
 
 
   /* Special */
 
-  --color-success: oklch(0.65 0.18 150);
-  --color-info: oklch(0.65 0.15 240);
+  --color-success: #22C55E;
+  --color-info: #3B82F6;
+  --color-accent: #FF6C37;
 
 }
 /* 
