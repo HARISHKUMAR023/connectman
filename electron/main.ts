@@ -2,7 +2,21 @@ import { app, BrowserWindow } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import Database from 'better-sqlite3'
+import { ipcMain } from 'electron'
+const dbPath = path.join(process.cwd(), 'connectman.db')
 
+const db = new Database(dbPath)
+
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS servers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    host TEXT,
+    username TEXT,
+    port INTEGER
+  )
+`).run()
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -65,4 +79,16 @@ app.on('activate', () => {
   }
 })
 
+ipcMain.handle('add-server', (_, server) => {
+  db.prepare(`
+    INSERT INTO servers (name, host, username, port)
+    VALUES (?, ?, ?, ?)
+  `).run(server.name, server.host, server.username, server.port)
+
+  return true
+})
+
+ipcMain.handle('get-servers', () => {
+  return db.prepare(`SELECT * FROM servers`).all()
+})
 app.whenReady().then(createWindow)
