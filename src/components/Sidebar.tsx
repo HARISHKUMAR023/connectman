@@ -19,10 +19,11 @@ interface Server {
 
 interface SidebarProps {
   onSelectServer?: (server: Server) => void
+  onAddServer?: (collectionId: number) => void
   onCollectionsChanged?: () => void
 }
 
-export default function Sidebar({ onSelectServer, onCollectionsChanged }: SidebarProps) {
+export default function Sidebar({ onSelectServer, onAddServer, onCollectionsChanged }: SidebarProps) {
   const [collections, setCollections] = useState<Collection[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null)
@@ -94,6 +95,7 @@ const handleSelectServer = (server: Server) => {
               onSelectCollection={setSelectedCollectionId}
               onSelectServer={handleSelectServer}
               onDeleteCollection={handleDeleteCollection}
+              onAddServer={onAddServer || (() => {})}
             />
           ) : (
             <div className="text-sm text-text-muted p-3 text-center">
