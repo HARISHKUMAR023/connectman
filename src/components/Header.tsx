@@ -1,57 +1,10 @@
-import { useState } from "react"
-import Button from "./Button"
-import AddServerModal from "./AddServerModal"
-
-export default function Header(){
-
-const [open,setOpen]=useState(false)
-
-return(
-
-<>
-
-<div className="flex justify-between p-4 border-b border-border">
-
-<h2 className="text-xl">
-
-Servers
-
-</h2>
-
-
-<div className="flex gap-3">
-
-<Button type="secondary">
-Import
-</Button>
-
-<Button type="secondary">
-Export
-</Button>
-
-
-<Button
-onClick={()=>setOpen(true)}
->
-
-+ Add Server
-
-</Button>
-
-
-</div>
-
-</div>
-
-
-<AddServerModal
-isOpen={open}
-onClose={()=>setOpen(false)}
-/>
-
-
-</>
-
-)
-
+export default function Header() {
+  return (
+    <div className="flex justify-between items-center px-6 py-4 border-b border-border bg-card">
+      <div>
+        <h2 className="text-xl font-bold text-text-primary">Server Manager</h2>
+        <p className="text-xs text-text-secondary mt-1">Manage SSH connections organized by collections</p>
+      </div>
+    </div>
+  )
 }
