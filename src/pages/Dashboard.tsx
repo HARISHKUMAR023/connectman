@@ -53,6 +53,7 @@ export default function Dashboard() {
     <div className="flex h-screen bg-background text-text-primary">
       <Sidebar 
         onSelectServer={handleSelectServer}
+        onAddServer={handleAddServer}
         onCollectionsChanged={handleRefresh}
       />
 

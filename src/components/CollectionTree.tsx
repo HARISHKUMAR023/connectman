@@ -21,6 +21,7 @@ interface CollectionTreeProps {
   onSelectCollection: (collectionId: number) => void
   onSelectServer: (server: Server) => void
   onDeleteCollection: (collectionId: number) => void
+  onAddServer: (collectionId: number) => void
 }
 
 export default function CollectionTree({
@@ -29,6 +30,7 @@ export default function CollectionTree({
   onSelectCollection,
   onSelectServer,
   onDeleteCollection,
+  onAddServer,
 }: CollectionTreeProps) {
   const [expandedCollections, setExpandedCollections] = useState<Set<number>>(new Set())
   const [servers, setServers] = useState<Map<number, Server[]>>(new Map())
@@ -88,16 +90,28 @@ export default function CollectionTree({
                 {collection.name}
               </span>
             </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onDeleteCollection(collection.id)
-              }}
-              className="opacity-0 group-hover:opacity-100 text-xs px-2 py-1 bg-danger-500 text-white rounded hover:bg-danger-700 transition"
-              title="Delete collection"
-            >
-              ×
-            </button>
+            <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onAddServer(collection.id)
+                }}
+                className="text-xs px-2 py-1 bg-primary-500 text-white rounded hover:bg-primary-600 transition"
+                title="Add server to collection"
+              >
+                +
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDeleteCollection(collection.id)
+                }}
+                className="text-xs px-2 py-1 bg-danger-500 text-white rounded hover:bg-danger-700 transition"
+                title="Delete collection"
+              >
+                ×
+              </button>
+            </div>
           </div>
 
           {expandedCollections.has(collection.id) && (
