@@ -2,7 +2,7 @@ import { useState } from "react"
 import Sidebar from "../components/Sidebar"
 import Header from "../components/Header"
 import ServerList from "../components/ServerList"
-import RequestBuilder from "../components/RequestBuilder"
+// import RequestBuilder from "../components/RequestBuilder"
 
 interface Request {
   id?: number
@@ -17,8 +17,8 @@ interface Request {
 }
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<"requests" | "servers">("requests")
-  const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
+  const [activeTab, setActiveTab] = useState<"requests" | "servers">("servers")
+  // const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
 
   const handleSelectRequest = (request: Request) => {
     setSelectedRequest(request)
@@ -33,7 +33,7 @@ export default function Dashboard() {
         <Header />
 
         <div className="flex border-b border-border bg-card">
-          <button
+          {/* <button
             onClick={() => setActiveTab("requests")}
             className={`px-4 py-3 font-medium transition ${
               activeTab === "requests"
@@ -42,7 +42,7 @@ export default function Dashboard() {
             }`}
           >
             API Requests
-          </button>
+          </button> */}
           <button
             onClick={() => setActiveTab("servers")}
             className={`px-4 py-3 font-medium transition ${
@@ -56,10 +56,11 @@ export default function Dashboard() {
         </div>
 
         <div className="flex-1 overflow-hidden">
-          {activeTab === "requests" && (
+           <ServerList />
+          {/* {activeTab === "requests" && (
             <RequestBuilder request={selectedRequest} />
-          )}
-          {activeTab === "servers" && <ServerList />}
+          )} */}
+          {/* {activeTab === "servers" && <ServerList />} */}
         </div>
       </div>
     </div>

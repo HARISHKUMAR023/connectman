@@ -29,31 +29,29 @@ export default function Sidebar({ onSelectRequest, onCollectionsChanged }: Sideb
   useEffect(() => {
     loadCollections()
   }, [])
-
-  const loadCollections = async () => {
-    try {
-      const result = await window.ipcRenderer.invoke('db:getCollections')
-      setCollections(result || [])
-    } catch (err) {
-      console.error('Failed to load collections:', err)
-    }
+const loadCollections = async () => {
+  try {
+    const result = await window.ipcRenderer.invoke('collections:get')
+    setCollections(result || [])
+  } catch (err) {
+    console.error('Failed to load collections:', err)
   }
+}
 
-  const handleAddCollection = async (collection: { name: string; description: string }) => {
-    try {
-      await window.ipcRenderer.invoke('db:addCollection', collection)
-      setIsModalOpen(false)
-      loadCollections()
-      onCollectionsChanged?.()
-    } catch (err) {
-      console.error('Failed to add collection:', err)
-    }
+  const handleAddCollection = async (collection: { name: string }) => {
+  try {
+    await window.ipcRenderer.invoke('collections:add', collection.name)
+    setIsModalOpen(false)
+    loadCollections()
+  } catch (err) {
+    console.error('Failed to add collection:', err)
   }
+}
 
   const handleDeleteCollection = async (collectionId: number) => {
     if (window.confirm('Are you sure you want to delete this collection?')) {
       try {
-        await window.ipcRenderer.invoke('db:deleteCollection', collectionId)
+         await window.ipcRenderer.invoke('collections:delete', collectionId)
         loadCollections()
         onCollectionsChanged?.()
       } catch (err) {
