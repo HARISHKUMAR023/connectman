@@ -4,7 +4,7 @@ import Header from "../components/Header"
 import ServerDetail from "../components/ServerDetail"
 import AddServerModal from "../components/AddServerModal"
 import SSHConnector from "../components/SSHConnector"
-
+import { ServerOff } from "lucide-react"
 interface Server {
   id: number
   collectionId: number
@@ -72,7 +72,11 @@ export default function Dashboard() {
             ) : (
               <div className="flex-1 flex items-center justify-center bg-background p-6">
                 <div className="text-center">
-                  <div className="text-6xl mb-4 text-primary-500">○</div>
+                  <div className="flex justify-center mb-6">
+  <div className="w-20 h-20 flex items-center justify-center rounded-2xl  text-primary-500 ">
+    <ServerOff size={40} strokeWidth={1.5} />
+  </div>
+</div>
                   <h3 className="text-2xl font-bold text-text-primary mb-2">
                     Select a Server
                   </h3>

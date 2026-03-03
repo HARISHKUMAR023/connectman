@@ -69,13 +69,21 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win: BrowserWindow | null = null
 
 function createWindow() {
+  
   win = new BrowserWindow({
+    // backgroundColor: '#0f172a',
+     width: 1200,
+  height: 800,
+  minWidth: 900,
+  minHeight: 600,
+    autoHideMenuBar: true,
+    //  frame: false,
     icon: path.join(process.env.VITE_PUBLIC!, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
   })
-
+win.setMenu(null)
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send(
       'main-process-message',

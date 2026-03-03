@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import { ChevronRight } from "lucide-react"
+import { Folder, FolderOpen } from "lucide-react"
 
 interface Server {
   id: number
@@ -77,9 +79,19 @@ export default function CollectionTree({
                 toggleExpanded(collection.id)
               }}
             >
-              <span className="mr-2 text-primary-500">
-                {expandedCollections.has(collection.id) ? '▼' : '▶'}
-              </span>
+           <span className="mr-2 text-secondary-500 transition-transform duration-200">
+  <ChevronRight
+    size={16}
+    className={`transform transition-transform duration-200 ${
+      expandedCollections.has(collection.id) ? "rotate-90" : ""
+    }`}
+  />
+</span>
+{/* {expandedCollections.has(collection.id) ? (
+  <FolderOpen size={16} />
+) : (
+  <Folder size={16} />
+)} */}
               <span
                 className={`font-medium ${
                   selectedCollectionId === collection.id
